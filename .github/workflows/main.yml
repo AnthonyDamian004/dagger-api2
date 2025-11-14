@@ -1,0 +1,37 @@
+name: CI - API Node
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1) Descargar el código del repo
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2) Configurar Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # 3) Instalar dependencias
+      - name: Install dependencies
+        run: npm install
+
+      # 4) Levantar la API en segundo plano
+      - name: Start API server
+        run: |
+          npm start &
+          sleep 5
+
+      # 5) Verificar el estado de la API con /health
+      - name: Health check
+        run: |
+          curl -v http://localhost:8080/health
